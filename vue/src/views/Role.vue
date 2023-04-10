@@ -79,15 +79,18 @@
       <el-tree
           :props = "props"
           :data="menuData"
+          ref="tree"
           show-checkbox
           node-key="id"
-          :default-expanded-keys="[1]"
-          :default-checked-keys="[4]"
-          @check-change="handleCheckChange">
+          :default-expanded-keys="expends"
+          :default-checked-keys="checks">
+        <span class="custom-tree-node" slot-scope="{node, data}">
+          <span><i :class="data.icon"></i>{{data.name}} </span>
+        </span>
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="menuDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="save">确 定</el-button>
+        <el-button type="primary" @click="saveRoleMenu">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -111,7 +114,10 @@ export default {
       menuData:[],
       props: {
         label: 'name'
-      }
+      },
+      checks:[],
+      expends:[],
+      roleId: 0
     }
   },
   created() {
@@ -175,6 +181,17 @@ export default {
         }
       })
     },
+    saveRoleMenu(){
+      this.request.post("/role/roleMenu/" + this.roleId, this.$refs.tree.getCheckedKeys()).then(res => {
+        if(res.code === '200'){
+          this.$message.success("绑定成功")
+          this.menuDialogVisible = false
+        }
+        else {
+          this.$message.error(res.msg)
+        }
+      })
+    },
     handleSizeChange(pageSize) {
       console.log(pageSize)
       this.pageSize = pageSize
@@ -205,13 +222,17 @@ export default {
     },
     selectMenu(roleId){
       this.menuDialogVisible = true
+      this.roleId = roleId
       //请求菜单数据
       this.request.get("/menu").then(res => {
         this.menuData = res.data
+        //把后台返回的菜单数据处理成id数组
+        this.expends = this.menuData.map(v => v.id)
       })
-    },
-    handleCheckChange(data, checked, indeterminate) {
-      console.log(data, checked, indeterminate);
+
+      this.request.get("/role/roleMenu/" + roleId).then(res => {
+        this.checks = res.data
+      })
     },
   }
 }

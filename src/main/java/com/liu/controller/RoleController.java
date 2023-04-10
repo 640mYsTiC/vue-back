@@ -3,6 +3,8 @@ package com.liu.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liu.common.Result;
+import com.liu.entity.RoleMenu;
+import com.liu.mapper.RoleMenuMapper;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -26,6 +28,8 @@ public class RoleController {
     @Resource
     private IRoleService roleService;
 
+    @Resource
+    private RoleMenuMapper roleMenuMapper;
     @PostMapping
     public Result save(@RequestBody Role role) {
         roleService.saveOrUpdate(role);
@@ -64,5 +68,18 @@ public class RoleController {
         return Result.success(roleService.page(new Page<>(pageNum, pageSize), queryWrapper));
     }
 
+    /*
+    绑定角色和菜单的关系
+     */
+    @PostMapping("/roleMenu/{roleId}")
+    public Result roleMenu(@PathVariable Integer roleId, @RequestBody List<Integer> menuIds){
+        roleService.setRoleMenu(roleId, menuIds);
+        return Result.success();
+    }
 
+    @GetMapping("/roleMenu/{roleId}")
+    public Result getRoleMenu(@PathVariable Integer roleId){
+
+        return Result.success(roleService.getRoleMenu(roleId));
+    }
 }
