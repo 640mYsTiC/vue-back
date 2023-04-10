@@ -47,16 +47,11 @@ export default {
       this.$emit("asideCollapse")
     },
     logout(){
-      this.$router.push("/login")
-      localStorage.removeItem("user")
+      this.$store.commit("logout")
       this.$message.success("退出成功")
     }
   },
-  // watch: {
-  //   '$route': function () {
-  //     this.currentPathName = localStorage.getItem("currentPathName")
-  //   }
-  // },
+
   data(){
     return {
 

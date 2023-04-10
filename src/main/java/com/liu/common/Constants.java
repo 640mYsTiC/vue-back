@@ -11,4 +11,5 @@ public interface Constants {
     String CODE_600 = "600";    // 其他业务错误
 
     String DICT_TYPE_ICON = "icon";
+
 }

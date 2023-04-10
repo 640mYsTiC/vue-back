@@ -40,4 +40,6 @@ public class Menu implements Serializable {
       private List<Menu> children;
 
       private Integer pid;
+
+      private String pagePath;
 }

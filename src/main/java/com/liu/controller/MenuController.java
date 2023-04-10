@@ -52,20 +52,12 @@ public class MenuController {
 
     @GetMapping
     public Result findAll(@RequestParam(defaultValue = "") String name) {
-        QueryWrapper<Menu> queryWrapper = new QueryWrapper<>();
-        queryWrapper.like("name",name);
-        //查询所有数据
-        List<Menu> list = menuService.list();
-        //找出pid为null的一级菜单
-        List<Menu> parentNode = list.stream().filter(menu -> menu.getPid() == null).collect(Collectors.toList());
-        //找出一级菜单的字菜单
-        for(Menu menu : parentNode)
-        {   //筛选所有数据中pid等于父级id
-            menu.setChildren(list.stream().filter(m -> menu.getId().equals(m.getPid())).collect(Collectors.toList()));
-        }
-        return Result.success(parentNode);
+        return Result.success(menuService.findMenus(name));
     }
-
+    @GetMapping("/ids")
+    public Result findAllIds(){
+        return Result.success(menuService.list().stream().map(Menu::getId));
+    }
     @GetMapping("/icons")
     public Result getIcons() {
         QueryWrapper<Dict> queryWrapper = new QueryWrapper<>();
