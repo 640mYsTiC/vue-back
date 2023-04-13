@@ -2,6 +2,7 @@ package com.liu.controller;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liu.common.Constants;
 import com.liu.common.Result;
 import com.liu.controller.dto.UserDTO;
+import com.liu.controller.dto.UserPasswordDTO;
 import com.liu.entity.User;
 import com.liu.service.IUserService;
 import com.liu.utils.TokenUtils;
@@ -160,7 +162,16 @@ public Result imp(MultipartFile file) throws Exception {
         UserDTO dto = userService.login(userDTO);
         return Result.success(dto);
     }
-
+    /*
+     * 修改密码
+   */
+    @PostMapping("/password")
+    public Result password(@RequestBody UserPasswordDTO userPasswordDTO) {
+        userPasswordDTO.setPassword(SecureUtil.md5(userPasswordDTO.getPassword()));
+        userPasswordDTO.setNewPassword(SecureUtil.md5(userPasswordDTO.getNewPassword()));
+        userService.updatePassword(userPasswordDTO);
+        return Result.success();
+    }
     @GetMapping("/username/{username}")
     public Result findOne(@PathVariable String username){
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();

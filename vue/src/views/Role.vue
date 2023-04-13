@@ -121,6 +121,7 @@ export default {
       },
       checks:[],
       expends:[],
+      ids:[],
       roleId: 0,
       roleFlag: ''
     }
@@ -143,7 +144,9 @@ export default {
         this.total = res.data.total
 
       })
-
+      this.request.get("/menu/ids").then(res => {
+        this.ids = res.data
+      })
     },
     reset(){
       this.name = ""
@@ -241,14 +244,21 @@ export default {
 
       this.request.get("/role/roleMenu/" + this.roleId).then(res => {
         this.checks = res.data
-        this.request.get("/menu/ids").then(r => {
-          const ids = r.data
-          ids.forEach(id => {
-            if(!this.checks.includes(id)){
+        // this.request.get("/menu/ids").then(r => {
+        //   const ids = r.data
+        //   ids.forEach(id => {
+        //     if(!this.checks.includes(id)){
+        //       this.$refs.tree.setChecked(id, false,false)
+        //     }
+        //   })
+        //
+        // })
+        this.ids.forEach(id => {
+          if(!this.checks.includes(id)){
+            this.$nextTick(() => {  //nextTick处理未来元素，渲染完毕再进行处理
               this.$refs.tree.setChecked(id, false,false)
-            }
-          })
-
+            })
+          }
         })
         this.menuDialogVisible = true
       })

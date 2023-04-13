@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.liu.common.Constants;
 import com.liu.controller.dto.UserDTO;
+import com.liu.controller.dto.UserPasswordDTO;
 import com.liu.entity.Menu;
 import com.liu.exception.ServiceException;
 import com.liu.mapper.RoleMapper;
@@ -42,6 +43,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     private IMenuService menuService;
+
+    @Resource
+    private UserMapper userMapper;
     @Override
     public UserDTO login(UserDTO userDTO) {
         User one = getUserInfo(userDTO);
@@ -111,5 +115,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             children.removeIf(child -> !menuIds.contains(child.getId()));
         }
         return roleMenus;
+    }
+
+    @Override
+    public void updatePassword(UserPasswordDTO userPasswordDTO) {
+        int update = userMapper.updateUserPassword(userPasswordDTO);
+        if (update < 1) {
+            throw new ServiceException(Constants.CODE_600, "密码错误");
+        }
     }
 }
