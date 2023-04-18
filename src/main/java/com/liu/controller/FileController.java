@@ -33,6 +33,8 @@ public class FileController {
     @Value("${files.upload.path}")
     private String fileUploadPath;
 
+    @Value("${server.ip}")
+    private String serverIp;
     @Resource
     private FileMapper fileMapper;
 
@@ -73,7 +75,7 @@ public class FileController {
         }
         else {
             //不存在重复则把获取到的文件存储到磁盘目录
-            url = "http://localhost:9090/file/" + fileUuid;
+            url = "http://"+ serverIp +":9090/file/" + fileUuid;
         }
 
         //存储数据库

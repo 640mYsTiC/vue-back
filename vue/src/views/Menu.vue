@@ -42,7 +42,7 @@
       <el-table-column prop="description" label="描述"></el-table-column>
       <el-table-column label="操作"  width="300" align="center">
         <template v-slot = "scope">
-          <el-button type="primary" @click="handleAdd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path" >新增子菜单<i class="el-icon-plus"></i></el-button>
+          <el-button type="primary" @click="handleAdd(scope.row.id)" v-if="!scope.row.pid && !scope.row.path">新增子菜单 <i class="el-icon-plus"></i></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
           <el-popconfirm
               class="ml-5"
@@ -73,7 +73,7 @@
         <el-form-item label="图标">
           <el-select clearable v-model="form.icon" placeholder="请选择" style="width: 100%">
             <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
-              <i :class="item.value"/> {{item.name}}
+              <i :class="item.value" /> {{ item.name }}
             </el-option>
           </el-select>
         </el-form-item>
@@ -91,10 +91,13 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   name: "Menu",
   data(){
     return {
+      serverIp: serverIp,
       tableData: [],
       total: 0,
       pageNum: 1,

@@ -8,6 +8,7 @@ import java.util.List;
 //接收前端登录数据
 @Data
 public class UserDTO {
+    private Integer id;
     private String username;
     private String password;
     private String nickname;

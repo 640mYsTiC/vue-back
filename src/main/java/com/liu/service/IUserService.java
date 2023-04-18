@@ -1,5 +1,6 @@
 package com.liu.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.liu.controller.dto.UserDTO;
 import com.liu.controller.dto.UserPasswordDTO;
@@ -19,4 +20,6 @@ public interface IUserService extends IService<User> {
     User register(UserDTO userDTO);
 
     void updatePassword(UserPasswordDTO userPasswordDTO);
+
+    Page findPage(Page<User> page, String username, String email, String address);
 }

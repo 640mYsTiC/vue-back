@@ -1,9 +1,10 @@
 import axios from 'axios'
 import ElementUI from "element-ui";
+import {serverIp} from "../../public/config";
 
 const request = axios.create({
-    baseURL: 'http://localhost:9090',
-    timeout: 5000
+    baseURL: `http://${serverIp}:9090`,
+    timeout: 30000
 })
 
 // request 拦截器
