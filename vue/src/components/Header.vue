@@ -11,7 +11,6 @@
   </div>
   <el-dropdown style="width: 200px; cursor: pointer; text-align: right" >
     <div style="width: 150px">
-<!--      <img src="https://img.wxcha.com/m00/5a/6e/83a236144820656596427616d3db1c40.jpg" alt=""-->
       <img referrerpolicy="no-referrer" :src="user.avatarUrl" alt=""
            style="width: 30px; border-radius: 50%; position: relative; right: 5px; top: 10px;">
       <span>{{ user.nickname }}</span><i class="el-icon-arrow-down" style="position: relative; margin-left: 5px; "></i>

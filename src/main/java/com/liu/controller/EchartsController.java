@@ -4,8 +4,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Quarter;
 import com.liu.common.Result;
+import com.liu.config.AuthAccess;
 import com.liu.entity.User;
+import com.liu.mapper.FileMapper;
 import com.liu.service.IUserService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +28,10 @@ public class EchartsController {
 
     @Autowired
     private IUserService userService;
+
+    @Resource
+    private FileMapper fileMapper;
+
     @GetMapping("/example")
     public Result get(){
         Map<String, Object> map = new HashMap<>();
@@ -53,5 +60,11 @@ public class EchartsController {
             }
         }
         return Result.success(CollUtil.newArrayList(q1, q2, q3, q4));
+    }
+
+    @AuthAccess
+    @GetMapping("/file/front/all")
+    public Result frontAll(){
+        return Result.success(fileMapper.selectList(null));
     }
 }

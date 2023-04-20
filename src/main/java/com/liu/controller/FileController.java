@@ -42,7 +42,10 @@ public class FileController {
     public Result save(@RequestBody Files file) {
         return Result.success(fileMapper.updateById(file));
     }
-
+    @PostMapping("/front/all")
+    public Result frontAll() {
+        return Result.success(fileMapper.selectList(null));
+    }
     @PostMapping("/upload")
     public String upload(@RequestParam MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
