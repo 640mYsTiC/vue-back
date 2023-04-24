@@ -3,13 +3,20 @@ package com.liu.controller;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.Quarter;
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.liu.common.Constants;
 import com.liu.common.Result;
 import com.liu.config.AuthAccess;
+import com.liu.entity.Files;
 import com.liu.entity.User;
 import com.liu.mapper.FileMapper;
 import com.liu.service.IUserService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.liu.common.Constants.FILES_KEY;
 import static org.apache.poi.sl.usermodel.PlaceholderDetails.PlaceholderSize.quarter;
 
 @RestController
@@ -31,6 +39,9 @@ public class EchartsController {
 
     @Resource
     private FileMapper fileMapper;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @GetMapping("/example")
     public Result get(){
@@ -65,6 +76,20 @@ public class EchartsController {
     @AuthAccess
     @GetMapping("/file/front/all")
     public Result frontAll(){
-        return Result.success(fileMapper.selectList(null));
+        //1.从缓存获取数据
+        String jsonStr = stringRedisTemplate.opsForValue().get(FILES_KEY);
+        List<Files> files;
+        if(StrUtil.isBlank(jsonStr)){  //取出为空（没有缓存）
+             files = fileMapper.selectList(null);
+             //在缓存到redis
+            stringRedisTemplate.opsForValue().set(FILES_KEY, JSONUtil.toJsonStr(files));
+        }
+        else {
+            //如果有 则从redis中取出数据
+            files = JSONUtil.toBean(jsonStr, new TypeReference<List<Files>>() {
+            }, true);
+        }
+
+        return Result.success(files);
     }
 }

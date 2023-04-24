@@ -4,8 +4,10 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.liu.common.Constants;
 import com.liu.common.Result;
 import com.liu.entity.Files;
 import com.liu.entity.User;
@@ -14,7 +16,11 @@ import com.liu.utils.TokenUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,9 +44,15 @@ public class FileController {
     @Resource
     private FileMapper fileMapper;
 
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+    //@CachePut(value = "files", key = "'frontAll'")
     @PostMapping("/update")
     public Result save(@RequestBody Files file) {
-        return Result.success(fileMapper.updateById(file));
+        fileMapper.updateById(file);
+        flushRedis(Constants.FILES_KEY);
+        return Result.success();
     }
     @PostMapping("/front/all")
     public Result frontAll() {
@@ -89,6 +101,9 @@ public class FileController {
         saveFile.setUrl(url);
         saveFile.setMd5(md5);
         fileMapper.insert(saveFile);
+        //设置最新缓存
+        List<Files> files = fileMapper.selectList(null);
+        setCache(Constants.FILES_KEY, JSONUtil.toJsonStr(files));
         return url;
 
     }
@@ -122,11 +137,14 @@ public class FileController {
     /*
     删除
      */
+    //清楚一条缓存，key为要清楚的数据
+    //@CacheEvict(value = "files", key = "'frontAll'")
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Integer id) {
         Files files = fileMapper.selectById(id);
-        files.setIs_delete(true);
+        files.setIsdelete(true);
         fileMapper.updateById(files);
+        flushRedis(Constants.FILES_KEY);
         return Result.success();
     }
 
@@ -136,7 +154,7 @@ public class FileController {
         queryWrapper.in("id",ids);
         List<Files> files = fileMapper.selectList(queryWrapper);
         for (Files file : files){
-            file.setIs_delete(true);
+            file.setIsdelete(true);
             fileMapper.updateById(file);
         }
         return Result.success();
@@ -150,11 +168,20 @@ public class FileController {
                            @RequestParam(defaultValue = "") String name) {
         QueryWrapper<Files> queryWrapper = new QueryWrapper<>();
         //查询未删除记录
-        queryWrapper.eq("is_delete", false);
+        queryWrapper.eq("isdelete", false);
         queryWrapper.orderByDesc("id");
         if (!"".equals(name)) {
             queryWrapper.like("name", name);
         }
         return Result.success(fileMapper.selectPage(new Page<>(pageNum, pageSize), queryWrapper));
+    }
+
+    //设置缓存
+    private void setCache(String key, String value){
+        stringRedisTemplate.opsForValue().set(key, value);
+    }
+    //删除缓存
+    private void flushRedis(String key){
+        stringRedisTemplate.delete(key);
     }
 }
