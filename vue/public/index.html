@@ -14,4 +14,13 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script type="text/javascript"
+          src="https://webapi.amap.com/maps?v=2.0&key=2f14d376a856b0b3ad429c25004f82cb">
+      window._AMapSecurityConfig = {
+          serviceHost:'localhost:8080/_AMapService',
+          securityJsCode:gloableConfig.secretKey,  //安全秘钥(官网文档强调2021年12月2日起，新申请的Key就必须和安全秘钥一起使用了) 或者服务器地址
+          // 例如 ：serviceHost:'http://1.1.1.1:80/_AMapService',
+      }
+
+  </script>
 </html>
