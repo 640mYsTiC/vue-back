@@ -55,9 +55,4 @@ public class User implements Serializable {
 
       private String role;
 
-      @TableField(exist = false)
-      private List<Course> courses;
-
-      @TableField(exist = false)
-      private List<Course> stuCourses;
 }

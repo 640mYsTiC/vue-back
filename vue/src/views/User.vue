@@ -39,8 +39,7 @@
       <el-table-column prop="role" label="角色">
         <template slot-scope="scope">
           <el-tag type="primary" v-if="scope.row.role === 'ROLE_ADMIN'">管理员</el-tag>
-          <el-tag type="warning" v-if="scope.row.role === 'ROLE_STUDENT'">学生</el-tag>
-          <el-tag type="success" v-if="scope.row.role === 'ROLE_TEACHER'">教师</el-tag>
+
         </template>
       </el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
@@ -49,8 +48,6 @@
 
       <el-table-column label="操作"  width="300" align="center">
         <template v-slot = "scope">
-          <el-button type="primary" @click="lookCourse(scope.row.courses)" v-if="scope.row.role === 'ROLE_TEACHER'">查看教授课程 <i class="el-icon-document"></i></el-button>
-          <el-button type="warning" @click="lookStuCourse(scope.row.stuCourses)" v-if="scope.row.role === 'ROLE_STUDENT'">查看已选课程 <i class="el-icon-document"></i></el-button>
           <el-button type="success" @click="handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
           <el-popconfirm
               class="ml-5"
@@ -107,18 +104,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog title="课程信息" :visible.sync="vis" width="30%">
-      <el-table :data="courses" border stripe>
-        <el-table-column prop="name" label="课程名称"></el-table-column>
-        <el-table-column prop="score" label="学分"></el-table-column>
-      </el-table>
-    </el-dialog>
-    <el-dialog title="选课信息" :visible.sync="stuVis" width="30%">
-      <el-table :data="courses" border stripe>
-        <el-table-column prop="name" label="课程名称"></el-table-column>
-        <el-table-column prop="score" label="学分"></el-table-column>
-      </el-table>
-    </el-dialog>
+
   </div>
 </template>
 
@@ -143,8 +129,6 @@ export default {
       dialogFormVisible:false,
       headerBg: 'headerBg',
       roles: [],
-      courses:[],
-      stuCourses:[],
       vis:false,
       stuVis:false
     }
@@ -251,14 +235,7 @@ export default {
       this.$message.success("导入成功")
       this.load()
     },
-    lookCourse(courses){
-      this.courses = courses
-      this.vis = true
-    },
-    lookStuCourse(stuCourses){
-      this.stuCourses = stuCourses
-      this.stuVis = true
-    }
+
   }
 }
 </script>
