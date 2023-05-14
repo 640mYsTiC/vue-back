@@ -256,7 +256,7 @@ export default {
     },
     save(){
       console.log(this.form)
-      this.request.post("/purchaseAgreements", this.form).then(res =>{
+      this.request.post("/billSettlement", this.form).then(res =>{
         if(res.code === '200'){
           this.$message.success("保存成功")
           this.dialogFormVisible = false

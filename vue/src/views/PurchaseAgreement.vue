@@ -205,11 +205,17 @@ export default {
     getSupplierContact(val){
       this.request.get("/supplier/getContact/" + val).then(res => {
         if(res.code === '200'){
-          console.log(res.data.contactPerson)
+          const len = 3
+          const codeList = []
+          const chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz0123456789'
+          const charsLen = chars.length
+          for (let i = 0; i < len; i++) {
+            codeList.push(chars.charAt(Math.floor(Math.random() * charsLen)))
+          }
           this.$set(this.form,'date', this.currentTime()); //正确赋值
           this.$set(this.form,'contactPerson', res.data.contactPerson); //正确赋值
           this.$set(this.form,'contactPhone', res.data.contactPhone); //正确赋值
-          this.$set(this.form,'agreementCode', "BGM"+this.currentTime()+Math.round(Math.random()*30)); //正确赋值
+          this.$set(this.form,'agreementCode', "BGM"+this.currentTime()+codeList.join('')); //正确赋值
         }
         else{
           this.$message.error("供应商信息请求失败")
