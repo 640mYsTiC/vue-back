@@ -28,7 +28,7 @@ public class CodeGenerator {
                 })
                 .strategyConfig(builder -> {
                     builder.entityBuilder().enableLombok();
-                    builder.addInclude("bill_settlement") // 设置需要生成的表名
+                    builder.addInclude("in_materialmanage") // 设置需要生成的表名
                             .addTablePrefix("bgm_", "sys_", "material_", "weigh_"); // 设置过滤表前缀
                 })
                 .execute();

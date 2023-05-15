@@ -29,7 +29,7 @@ public class TokenUtils {
     //生成token
     public static String getToken(String userId, String sign){
         return JWT.create().withAudience(userId)   //将userId保存到token里 作为载荷
-                .withExpiresAt(DateUtil.offsetHour(new Date(), 2))  //两小时后过期
+                .withExpiresAt(DateUtil.offsetHour(new Date(), 48))  //48小时后过期
                 .sign(Algorithm.HMAC256(sign)); //以password作为token的秘钥
     }
     //获取当前登录用户信息

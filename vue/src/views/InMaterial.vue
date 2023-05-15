@@ -28,18 +28,16 @@
           width="55">
       </el-table-column>
       <el-table-column prop="id" label="id" ></el-table-column>
-      <el-table-column prop="settlementCode" label="结算编号"></el-table-column>
-      <el-table-column prop="date" label="结算日期"></el-table-column>
-      <el-table-column prop="agreementCode" label="协议编号"></el-table-column>
-      <el-table-column prop="status" label="状态"></el-table-column>
+      <el-table-column prop="inCode" label="收料编号"></el-table-column>
+      <el-table-column prop="inMaterial" label="收入材料"></el-table-column>
+      <el-table-column prop="inAgreement" label="材料"></el-table-column>
       <el-table-column prop="supplier" label="供应商"></el-table-column>
-      <el-table-column prop="material" label="材料"></el-table-column>
-      <el-table-column prop="billTime" label="账期"></el-table-column>
-      <el-table-column prop="weight" label="重量"></el-table-column>
-      <el-table-column prop="transFee" label="运费"></el-table-column>
-      <el-table-column prop="supplyFee" label="供货金额"></el-table-column>
-      <el-table-column prop="settlementFee" label="结算金额"></el-table-column>
-      <el-table-column prop="operator" label="操作员"></el-table-column>
+      <el-table-column prop="agreementCode" label="采购协议号"></el-table-column>
+      <el-table-column prop="inTime" label="收料时间"></el-table-column>
+      <el-table-column prop="inWeight" label="收料重量"></el-table-column>
+      <el-table-column prop="inStorage" label="储备库"></el-table-column>
+      <el-table-column prop="operator" label="操作人"></el-table-column>
+
       <el-table-column label="操作"  width="300px" align="center">
         <template slot-scope = "scope">
           <el-button type="success" @click="getAgreementInfo(); handleEdit(scope.row)">编辑 <i class="el-icon-edit"></i></el-button>
@@ -71,51 +69,42 @@
 
     <el-dialog title="协议信息" :visible.sync="dialogFormVisible" width="30%">
       <el-form label-width="80px" size="small">
-        <el-form-item label="结算编号">
-          <el-input v-model="form.settlementCode" disabled></el-input>
+        <el-form-item label="收料编号">
+          <el-input v-model="form.inCode" disabled></el-input>
         </el-form-item>
-        <el-form-item label="结算日期">
-          <el-input v-model="form.date" disabled></el-input>
+        <el-form-item label="收入材料">
+          <el-input v-model="form.inMaterial" disabled></el-input>
         </el-form-item>
-        <el-form-item label="协议编号">
-          <el-select clearable v-model="form.agreementCode" @change="getAgreementDetail" placeholder="请选择" style="width: 100%">
-            <el-option v-for="item in codes" :key="item.name" :label="item" :value="item">
+        <el-form-item label="材料">
+          <el-select clearable v-model="form.material" @change="getAgreementInfo" placeholder="请选择" style="width: 100%">
+            <el-option v-for="item in materials" :key="item.name" :label="item" :value="item">
               <i :class="item.value" /> {{ item }}
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="结算状态">
-          <el-radio-group v-model="form.status">
-            <el-radio-button label="制单"></el-radio-button>
-            <el-radio-button label="审核中"></el-radio-button>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item label="供应商">
-          <el-input v-model="form.supplier" disabled></el-input>
+          <el-select clearable v-model="form.supplier" @change="insertData" placeholder="请选择" style="width: 100%">
+            <el-option v-for="item in suppliers" :key="item.name" :label="item" :value="item">
+              <i :class="item.value" /> {{ item }}
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="物料">
-          .
-          <el-input v-model="form.material" disabled></el-input>
+        <el-form-item label="采购协议编号">
+          <el-input v-model="form.agreementCode" disabled></el-input>
         </el-form-item>
-        <el-form-item label="账期">
-          <el-date-picker
-              v-model="form.billTime"
-              type="date"
-              placeholder="选择日期">
-          </el-date-picker>
+        <el-form-item label="收料时间">
+          <el-input v-model="form.inTime" disabled></el-input>
         </el-form-item>
-        <el-form-item label="重量">
-          <el-input v-model="form.weight"  @change="countFee"></el-input>
+        <el-form-item label="收料重量">
+          <el-input v-model="form.inWeight" disabled></el-input>
         </el-form-item>
-        <el-form-item label="运费">
-          <el-input v-model="form.transFee" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="结算金额">
-          <el-input v-model="form.settlementFee" disabled></el-input>
+        <el-form-item label="储备库">
+
         </el-form-item>
         <el-form-item label="操作员">
-          <el-input v-model="form.operator" disabled></el-input>
+          <el-input v-model="form.operator"  @change="countFee"></el-input>
         </el-form-item>
+
 
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -142,8 +131,8 @@ export default {
       dialogFormVisible:false,
       headerBg: 'headerBg',
       operator: '',
-      codes:[],
-
+      materials:[],
+      suppliers:[]
     }
   },
   created() {
@@ -151,7 +140,6 @@ export default {
     const userInfo = JSON.parse(window.localStorage.getItem('user'));
     this.operator = userInfo.nickname;
     this.load()
-
   },
   methods:{
     load() {
@@ -195,11 +183,23 @@ export default {
       return strDate
     },
     getAgreementInfo(){
-      this.request.get("/billSettlement/agreementCode").then(res => {
+      this.request.get("/inMaterialmanage/materials").then(res => {
         if(res.code === '200'){
           console.log(res.data)
-          this.codes = res.data
+          this.materials = res.data
           this.load()
+        }
+        else{
+          this.$message.error("材料信息请求失败")
+          this.dialogFormVisible = false
+          this.load()
+        }
+      })
+    },
+    getAgreementDetail(val){
+      this.request.get("/inMaterialmanage/getAgreementDetail/" + val).then(res => {
+        if(res.code === '200'){
+          this.suppliers = res.data.supplier
         }
         else{
           this.$message.error("供应商信息请求失败")
@@ -209,23 +209,8 @@ export default {
 
       })
     },
-    getAgreementDetail(val){
-      this.request.get("/billSettlement/agreementDetail/" + val).then(res => {
-        if(res.code === '200'){
-          console.log(res.data)
-          this.$set(this.form,'settlementCode', "CJ"+this.currentTime()); //正确赋值
-          this.$set(this.form,'date', this.currentTime()); //正确赋值
-          this.$set(this.form,'supplier', res.data.supplier); //正确赋值
-          this.$set(this.form,'material', res.data.material); //正确赋值
-          this.$set(this.form,'operator', this.operator); //正确赋值
-        }
-        else{
-          this.$message.error("供应商信息请求失败")
-          this.dialogFormVisible = false
-          this.load()
-        }
+    insertData(val){
 
-      })
     },
     countFee(val){
       this.$set(this.form,'transFee', val*30); //正确赋值
