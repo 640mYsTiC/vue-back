@@ -30,13 +30,12 @@
       <el-table-column prop="id" label="id" ></el-table-column>
       <el-table-column prop="inCode" label="收料编号"></el-table-column>
       <el-table-column prop="inMaterial" label="收入材料"></el-table-column>
-      <el-table-column prop="inAgreement" label="材料"></el-table-column>
       <el-table-column prop="supplier" label="供应商"></el-table-column>
       <el-table-column prop="agreementCode" label="采购协议号"></el-table-column>
       <el-table-column prop="inTime" label="收料时间"></el-table-column>
       <el-table-column prop="inWeight" label="收料重量"></el-table-column>
       <el-table-column prop="inStorage" label="储备库"></el-table-column>
-      <el-table-column prop="operator" label="操作人"></el-table-column>
+      <el-table-column prop="operator" label="操作员"></el-table-column>
 
       <el-table-column label="操作"  width="300px" align="center">
         <template slot-scope = "scope">
@@ -72,18 +71,17 @@
         <el-form-item label="收料编号">
           <el-input v-model="form.inCode" disabled></el-input>
         </el-form-item>
+
         <el-form-item label="收入材料">
-          <el-input v-model="form.inMaterial" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="材料">
-          <el-select clearable v-model="form.material" @change="getAgreementInfo" placeholder="请选择" style="width: 100%">
+          <el-select clearable v-model="form.inMaterial" @change="getAgreementDetail" placeholder="请选择" style="width: 100%">
             <el-option v-for="item in materials" :key="item.name" :label="item" :value="item">
               <i :class="item.value" /> {{ item }}
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="供应商">
-          <el-select clearable v-model="form.supplier" @change="insertData" placeholder="请选择" style="width: 100%">
+          <el-select clearable v-model="form.supplier" @change="insertData"
+                     :disabled="!form.inMaterial" placeholder="请先选择材料" style="width: 100%">
             <el-option v-for="item in suppliers" :key="item.name" :label="item" :value="item">
               <i :class="item.value" /> {{ item }}
             </el-option>
@@ -93,16 +91,20 @@
           <el-input v-model="form.agreementCode" disabled></el-input>
         </el-form-item>
         <el-form-item label="收料时间">
-          <el-input v-model="form.inTime" disabled></el-input>
+          <el-date-picker
+              v-model="form.inTime"
+              type="date"
+              placeholder="选择日期">
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="收料重量">
-          <el-input v-model="form.inWeight" disabled></el-input>
+          <el-input v-model="form.inWeight"></el-input>
         </el-form-item>
         <el-form-item label="储备库">
-
+          <el-input v-model="form.inStorage"></el-input>
         </el-form-item>
         <el-form-item label="操作员">
-          <el-input v-model="form.operator"  @change="countFee"></el-input>
+          <el-input v-model="form.operator" disabled></el-input>
         </el-form-item>
 
 
@@ -118,7 +120,7 @@
 
 <script>
 export default {
-  name: "billSettlement",
+  name: "InMaterial",
   data(){
     return {
       tableData: [],
@@ -132,7 +134,8 @@ export default {
       headerBg: 'headerBg',
       operator: '',
       materials:[],
-      suppliers:[]
+      suppliers:[],
+      code:'',
     }
   },
   created() {
@@ -141,9 +144,14 @@ export default {
     this.operator = userInfo.nickname;
     this.load()
   },
+  filters: {
+      getBySupplier(entities, supplier) {
+        return entities.find(entity => entity.supplier === supplier);
+      },
+  },
   methods:{
     load() {
-      this.request.get("/billSettlement/page", {
+      this.request.get("/inMaterialmanage/page", {
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
@@ -197,24 +205,40 @@ export default {
       })
     },
     getAgreementDetail(val){
-      this.request.get("/inMaterialmanage/getAgreementDetail/" + val).then(res => {
+      this.request.get("/inMaterialmanage/getAgreementSupplier/" + val).then(res => {
         if(res.code === '200'){
-          this.suppliers = res.data.supplier
+          this.suppliers = res.data
+          const len = 3
+          const codeList = []
+          const chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz0123456789'
+          const charsLen = chars.length
+          for (let i = 0; i < len; i++) {
+            codeList.push(chars.charAt(Math.floor(Math.random() * charsLen)))
+          }
+          this.$set(this.form,'inCode', "SH"+this.currentTime()+codeList.join('')); //正确赋值
         }
         else{
           this.$message.error("供应商信息请求失败")
           this.dialogFormVisible = false
           this.load()
         }
-
       })
     },
     insertData(val){
+      this.request.get("/inMaterialmanage/getAgreementCode/" + val +"/" + this.form.inMaterial).then(res => {
+        if(res.code === '200'){
+          this.code = res.data.agreementCode
+          console.log("this code"+res.data)
+          this.$set(this.form,'agreementCode', this.code); //正确赋值
+          this.$set(this.form,'operator', this.operator); //正确赋值
+        }
+        else{
+          this.$message.error("协议信息请求失败")
+          this.dialogFormVisible = false
+          this.load()
+        }
+      })
 
-    },
-    countFee(val){
-      this.$set(this.form,'transFee', val*30); //正确赋值
-      this.$set(this.form,'settlementFee', val*30+1500); //正确赋值
     },
     reset(){
       this.name = ""
@@ -223,9 +247,10 @@ export default {
     handleEdit(row){
       this.form = row
       this.dialogFormVisible = true
+
     },
     del(id){
-      this.request.delete("/purchaseAgreements/" + id).then(res =>{
+      this.request.delete("/inMaterialmanage/" + id).then(res =>{
         if(res.code === '200'){
           this.$message.success("删除成功")
           this.dialogFormVisible = false
@@ -244,7 +269,7 @@ export default {
     },
     save(){
       console.log(this.form)
-      this.request.post("/billSettlement", this.form).then(res =>{
+      this.request.post("/inMaterialmanage", this.form).then(res =>{
         if(res.code === '200'){
           this.$message.success("保存成功")
           this.dialogFormVisible = false

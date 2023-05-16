@@ -31,13 +31,13 @@ public class InMaterialmanage implements Serializable {
 
     private String supplier;
 
+    private String agreementCode;
+
     private String inTime;
 
     private Object inWeight;
 
     private String inStorage;
-
-    private String agreementCode;
 
     private String operator;
 }

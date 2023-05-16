@@ -212,8 +212,15 @@ export default {
     getAgreementDetail(val){
       this.request.get("/billSettlement/agreementDetail/" + val).then(res => {
         if(res.code === '200'){
+          const len = 3
+          const codeList = []
+          const chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz0123456789'
+          const charsLen = chars.length
+          for (let i = 0; i < len; i++) {
+            codeList.push(chars.charAt(Math.floor(Math.random() * charsLen)))
+          }
           console.log(res.data)
-          this.$set(this.form,'settlementCode', "CJ"+this.currentTime()); //正确赋值
+          this.$set(this.form,'settlementCode', "CJ"+this.currentTime() + codeList.join('')); //正确赋值
           this.$set(this.form,'date', this.currentTime()); //正确赋值
           this.$set(this.form,'supplier', res.data.supplier); //正确赋值
           this.$set(this.form,'material', res.data.material); //正确赋值
@@ -240,7 +247,7 @@ export default {
       this.dialogFormVisible = true
     },
     del(id){
-      this.request.delete("/purchaseAgreements/" + id).then(res =>{
+      this.request.delete("/billSettlement/" + id).then(res =>{
         if(res.code === '200'){
           this.$message.success("删除成功")
           this.dialogFormVisible = false

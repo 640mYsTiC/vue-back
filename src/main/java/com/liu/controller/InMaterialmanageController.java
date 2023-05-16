@@ -59,9 +59,13 @@ public class InMaterialmanageController {
     public Result getMaterials(){
         return Result.success(inMaterialmanageMapper.getMaterials());
     }
-    @GetMapping("/getAgreementDetail/{material}")
-    public Result getAgreementDetail(@PathVariable String material){
-        return Result.success(mAndSMapper.getAgreementDetail(material));
+    @GetMapping("/getAgreementSupplier/{material}")
+    public Result getAgreementSupplier(@PathVariable String material){
+        return Result.success(mAndSMapper.getAgreementSupplier(material));
+    }
+    @GetMapping("/getAgreementCode/{supplier}/{material}")
+    public Result getAgreementCode(@PathVariable String supplier, @PathVariable String material){
+        return Result.success(mAndSMapper.getAgreementCode(supplier, material));
     }
     @GetMapping("/{id}")
     public Result findOne(@PathVariable Integer id) {
