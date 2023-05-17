@@ -17,7 +17,6 @@ public class CodeGenerator {
                         "z10bzz5199")
                 .globalConfig(builder -> {
                     builder.author("刘小白") // 设置作者
-                            .enableSwagger() // 开启 swagger 模式
                             .fileOverride() // 覆盖已生成文件
                             .outputDir("D:\\webSource\\apache-maven-3.8.5\\maven-repo\\sb+vue\\bgm\\src\\main\\java"); // 指定输出目录
                 })
@@ -28,7 +27,7 @@ public class CodeGenerator {
                 })
                 .strategyConfig(builder -> {
                     builder.entityBuilder().enableLombok();
-                    builder.addInclude("in_materialmanage") // 设置需要生成的表名
+                    builder.addInclude("client_manage") // 设置需要生成的表名
                             .addTablePrefix("bgm_", "sys_", "material_", "weigh_"); // 设置过滤表前缀
                 })
                 .execute();
