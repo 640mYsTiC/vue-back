@@ -235,7 +235,7 @@ export default {
       })
     },
     insertData(val){
-      this.request.get("/saleOrder/agreementCodes").then(res => {
+      this.request.get("/saleOrder/clientname/" + val).then(res => {
         if(res.code === '200'){
           this.clientname = res.data
           const len = 3
