@@ -8,7 +8,7 @@
 
 var content = [
   // 信息窗体的内容
-  "<div style='font-size: 14px; width: 200px; height: 50px'>芝士我的窗体</div>"
+  "<div style='font-size: 14px; width: 200px; height: 50px'>运货地点</div>"
 ];
 export default {
   name: "Map",
@@ -45,6 +45,25 @@ export default {
     marker.on('click', clickHandler);
     //将标记的点添加到已有实例
     map.add(marker);
+
+    let marker2 = new AMap.Marker({
+      position: new AMap.LngLat(106.45672,29.58597), // Marker经纬度,
+      title: '磁器口'
+    });
+    //绑定事件
+    marker2.on('click', clickHandler);
+    //将标记的点添加到已有实例
+    map.add(marker2);
+
+    let marker3 = new AMap.Marker({
+      position: new AMap.LngLat(106.58550,29.56807), // Marker经纬度,
+      title: '洪崖洞'
+    });
+    //绑定事件
+    marker3.on('click', clickHandler);
+    //将标记的点添加到已有实例
+    map.add(marker3);
+
     //获取用户所在城市信息
     function showCityInfo() {
       //实例化城市查询类

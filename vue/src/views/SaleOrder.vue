@@ -69,7 +69,7 @@
 
     <el-dialog title="订单信息" :visible.sync="dialogFormVisible" width="30%">
 
-      <el-form label-width="80px" size="small">
+      <el-form label-width="80px" size="small" :rules="rules" :model="form">
         <el-form-item label="订单编号">
           <el-input v-model="form.orderCode" disabled></el-input>
         </el-form-item>
@@ -115,7 +115,7 @@
         <el-form-item label="客户名称">
           <el-input v-model="form.clientname" disabled></el-input>
         </el-form-item>
-        <el-form-item label="计划方量">
+        <el-form-item label="计划方量" prop="estimatedVolume">
           <el-input v-model="form.estimatedVolume"></el-input>
         </el-form-item>
         <el-form-item label="操作员">
@@ -141,37 +141,44 @@ export default {
       pageNum: 1,
       pageSize: 10,
       name: "",
-      form:{},
-      multipleSelection:[],
-      dialogFormVisible:false,
+      form: {},
+      multipleSelection: [],
+      dialogFormVisible: false,
       headerBg: 'headerBg',
-      clientname:'',
-      clients:[],
-      ids:[],
-      pourMethods:[
+      clientname: '',
+      clients: [],
+      ids: [],
+      pourMethods: [
         {
-          value:'人工',
-          label:'人工'
+          value: '人工',
+          label: '人工'
         },
         {
-          value:'泵送',
-          label:'泵送'
+          value: '泵送',
+          label: '泵送'
         },
         {
-          value:'直卸',
-          label:'直卸'
+          value: '直卸',
+          label: '直卸'
         },
         {
-          value:'塔吊',
-          label:'塔吊'
+          value: '塔吊',
+          label: '塔吊'
         },
         {
-          value:'地泵',
-          label:'地泵'
+          value: '地泵',
+          label: '地泵'
         },
       ],
-      operator:''
+      operator: '',
+      rules: {
+        estimatedVolume: [
+          {required: true, message: '请输入计划方量', trigger: 'blur'},
+        ],
+      }
     }
+
+
   },
   created() {
     // 请求分页查询数据

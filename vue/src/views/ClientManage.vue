@@ -23,7 +23,6 @@
                  :on-success="handleExcelImportSuccess" style="display: inline-block">
         <el-button type="primary" class="ml-5">导入 <i class="el-icon-bottom"></i></el-button>
       </el-upload>
-      <el-button type="primary" @click="exp" class="ml-5">导出 <i class="el-icon-top"></i></el-button>
     </div>
 
     <el-table :data="tableData" border stripe :header-cell-class-name="headerBg" @selection-change="handleSelectionChange">
@@ -69,11 +68,11 @@
     </div>
 
     <el-dialog title="客户信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="80px" size="small">
-        <el-form-item label="单位名称">
+      <el-form label-width="80px" size="small" :rules="rules" :model="form">
+        <el-form-item label="单位名称" prop="clientname">
           <el-input v-model="form.clientname" ></el-input>
         </el-form-item>
-        <el-form-item label="单位类型">
+        <el-form-item label="单位类型" prop="clienttype">
           <el-select v-model="form.clienttype" clearable placeholder="请选择">
             <el-option
                 v-for="item in types"
@@ -83,13 +82,13 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="联系电话">
+        <el-form-item label="联系电话" prop="contactPhone">
           <el-input v-model="form.contactPhone" ></el-input>
         </el-form-item>
-        <el-form-item label="联系地址">
+        <el-form-item label="联系地址" prop="address">
           <el-input v-model="form.address" ></el-input>
         </el-form-item>
-        <el-form-item label="客户状态" >
+        <el-form-item label="客户状态">
           <el-radio-group v-model="form.status" @change="insertOperator">
             <el-radio-button label="启用"></el-radio-button>
             <el-radio-button label="暂停"></el-radio-button>
@@ -146,7 +145,21 @@ export default {
           value:'精加工石英砂',
           label:'精加工石英砂'
         },
-      ]
+      ],
+      rules: {
+        clientname: [
+          { required: true, message: '请输入客户名称', trigger: 'blur' },
+        ],
+        clienttype: [
+          { required: true, message: '请输入客户需求产品', trigger: 'blur' },
+        ],
+        contactPhone: [
+          { required: true, message: '请输入联系电话', trigger: 'blur' },
+        ],
+        address: [
+          { required: true, message: '请输入客户地址', trigger: 'blur' },
+        ],
+      }
     }
   },
   created() {

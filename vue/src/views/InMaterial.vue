@@ -67,7 +67,7 @@
     </div>
 
     <el-dialog title="协议信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="80px" size="small">
+      <el-form label-width="80px" size="small" :rules="rules" :model="form">
         <el-form-item label="收料编号">
           <el-input v-model="form.inCode" disabled></el-input>
         </el-form-item>
@@ -87,7 +87,7 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="采购协议编号">
+        <el-form-item label="采购协议">
           <el-input v-model="form.agreementCode" disabled></el-input>
         </el-form-item>
         <el-form-item label="收料时间">
@@ -97,10 +97,10 @@
               placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="收料重量">
+        <el-form-item label="收料重量" prop="inWeight">
           <el-input v-model="form.inWeight"></el-input>
         </el-form-item>
-        <el-form-item label="储备库">
+        <el-form-item label="储备库" prop="inStorage">
           <el-input v-model="form.inStorage"></el-input>
         </el-form-item>
         <el-form-item label="操作员">
@@ -136,6 +136,14 @@ export default {
       materials:[],
       suppliers:[],
       code:'',
+      rules: {
+        inWeight: [
+          { required: true, message: '请输入入库重量', trigger: 'blur' },
+        ],
+        inStorage: [
+          { required: true, message: '请输入放入的仓库', trigger: 'blur' },
+        ],
+      }
     }
   },
   created() {
@@ -222,8 +230,8 @@ export default {
     insertData(val){
       this.request.get("/inMaterialmanage/getAgreementCode/" + val +"/" + this.form.inMaterial).then(res => {
         if(res.code === '200'){
-          this.code = res.data.agreementCode
-          console.log("this code"+res.data)
+          this.code = res.data[0]
+          console.log("this code"+this.code)
           this.$set(this.form,'agreementCode', this.code); //正确赋值
           this.$set(this.form,'operator', this.operator); //正确赋值
         }

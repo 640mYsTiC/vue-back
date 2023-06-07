@@ -37,7 +37,6 @@
       <el-table-column prop="billTime" label="账期"></el-table-column>
       <el-table-column prop="weight" label="重量"></el-table-column>
       <el-table-column prop="transFee" label="运费"></el-table-column>
-      <el-table-column prop="supplyFee" label="供货金额"></el-table-column>
       <el-table-column prop="settlementFee" label="结算金额"></el-table-column>
       <el-table-column prop="operator" label="操作员"></el-table-column>
       <el-table-column label="操作"  width="300px" align="center">
@@ -70,7 +69,7 @@
     </div>
 
     <el-dialog title="协议信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="80px" size="small">
+      <el-form label-width="80px" :rules = "rules" size="small" :model="form">
         <el-form-item label="结算编号">
           <el-input v-model="form.settlementCode" disabled></el-input>
         </el-form-item>
@@ -104,10 +103,10 @@
               placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="重量">
+        <el-form-item label="重量" prop="weight">
           <el-input v-model="form.weight"  @change="countFee"></el-input>
         </el-form-item>
-        <el-form-item label="运费">
+        <el-form-item label="运费" id = weight>
           <el-input v-model="form.transFee" disabled></el-input>
         </el-form-item>
         <el-form-item label="结算金额">
@@ -143,7 +142,12 @@ export default {
       headerBg: 'headerBg',
       operator: '',
       codes:[],
+      rules: {
+        weight: [
+          { required: true, message: '请输入重量', trigger: 'blur' },
+        ],
 
+      }
     }
   },
   created() {

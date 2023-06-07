@@ -66,7 +66,7 @@
     </div>
 
     <el-dialog title="协议信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="80px" size="small">
+      <el-form label-width="80px" size="small" :rules="rules" :model="form">
         <el-form-item label="售料编号">
           <el-input v-model="form.outCode" disabled></el-input>
         </el-form-item>
@@ -93,10 +93,10 @@
               placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="出货重量">
+        <el-form-item label="出货重量" prop="outWeight">
           <el-input v-model="form.outWeight"></el-input>
         </el-form-item>
-        <el-form-item label="储备库">
+        <el-form-item label="储备库" prop="outStorage">
           <el-input v-model="form.outStorage"></el-input>
         </el-form-item>
         <el-form-item label="操作员">
@@ -132,6 +132,14 @@ export default {
       products:[],
       clients:[],
       code:'',
+      rules: {
+        outWeight: [
+          { required: true, message: '请输入出库的重量', trigger: 'blur' },
+        ],
+        outStorage: [
+          { required: true, message: '请输入仓库号', trigger: 'blur' },
+        ],
+      }
     }
   },
   created() {

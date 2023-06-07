@@ -62,17 +62,17 @@
     </div>
 
     <el-dialog title="供应商信息" :visible.sync="dialogFormVisible" width="30%">
-      <el-form label-width="80px" size="small">
-        <el-form-item label="名称">
-          <el-input v-model="form.supplierName" autocomplete="off"></el-input>
+      <el-form label-width="80px" :rules="rules" size="small" ref="supplierForm" :model="form">
+        <el-form-item label="名称" prop="supplierName">
+          <el-input v-model="form.supplierName" autocomplete="off" aria-required="true"></el-input>
         </el-form-item>
-        <el-form-item label="联系人">
+        <el-form-item label="联系人" prop="contactPerson">
           <el-input v-model="form.contactPerson" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="联系电话">
+        <el-form-item label="联系电话" prop="contactPhone">
           <el-input v-model="form.contactPhone" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱">
+        <el-form-item label="邮箱" prop="email">
           <el-input v-model="form.email" autocomplete="off"></el-input>
         </el-form-item>
 
@@ -105,6 +105,20 @@ export default {
         label: 'supplierName'
       },
       ids:[],
+      rules: {
+        supplierName: [
+          { required: true, message: '请输入客户公司名', trigger: 'blur' },
+        ],
+        contactPerson: [
+          { required: true, message: '请输入客户联系人', trigger: 'blur' },
+        ],
+        contactPhone: [
+          { required: true, message: '请确认客户联系电话', trigger: 'blur' },
+        ],
+        email: [
+          { required: true, message: '请确认邮箱', trigger: 'blur' },
+        ],
+      }
     }
   },
   created() {
@@ -155,20 +169,26 @@ export default {
       this.dialogFormVisible = true
       this.form = {}
     },
-    save(){
+    save() {
       console.log(this.form)
-      this.request.post("/supplier", this.form).then(res =>{
-        if(res.code === '200'){
-          this.$message.success("保存成功")
-          this.dialogFormVisible = false
-          this.load()
+      this.$refs['supplierForm'].validate((valid) => {
+        if (valid) {
+          this.request.post("/supplier", this.form).then(res => {
+            if (res.code === '200') {
+              this.$message.success("保存成功")
+              this.dialogFormVisible = false
+              this.load()
+            } else {
+              this.$message.error("保存失败")
+              this.dialogFormVisible = false
+              this.load()
+            }
+          })
         }
-        else{
-          this.$message.error("保存失败")
-          this.dialogFormVisible = false
-          this.load()
+        else {
+          this.$message.error("请完整填写")
         }
-      })
+      });
     },
     handleSizeChange(pageSize) {
       console.log(pageSize)

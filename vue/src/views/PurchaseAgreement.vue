@@ -68,7 +68,7 @@
 
     <el-dialog title="结算信息" :visible.sync="dialogFormVisible" width="30%">
 
-      <el-form label-width="80px" size="small">
+      <el-form label-width="80px" size="small" :rules="rules" :ref="agreementForm" :model="form">
         <el-form-item label="协议编号">
           <el-input v-model="form.agreementCode" disabled></el-input>
         </el-form-item>
@@ -77,13 +77,13 @@
         </el-form-item>
 
         <el-form-item label="协议状态">
-          <el-radio-group v-model="form.status">
+          <el-radio-group v-model="form.status" >
             <el-radio-button label="实施中"></el-radio-button>
             <el-radio-button label="暂停"></el-radio-button>
             <el-radio-button label="未启用"></el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="采购材料">
+        <el-form-item label="采购材料" prop="material">
           <el-input v-model="form.material" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="供应商">
@@ -136,6 +136,12 @@ export default {
       names:[],
       contact:[],
       phone:[],
+      rules: {
+        material: [
+          { required: true, message: '请输入需要的材料', trigger: 'blur' },
+        ],
+
+      }
     }
   },
   created() {
@@ -251,18 +257,19 @@ export default {
     },
     save(){
       console.log(this.form)
-      this.request.post("/purchaseAgreements", this.form).then(res =>{
-        if(res.code === '200'){
-          this.$message.success("保存成功")
-          this.dialogFormVisible = false
-          this.load()
-        }
-        else{
-          this.$message.error("保存失败")
-          this.dialogFormVisible = false
-          this.load()
-        }
-      })
+
+      this.request.post("/purchaseAgreements", this.form).then(res => {
+            if (res.code === '200') {
+              this.$message.success("保存成功")
+              this.dialogFormVisible = false
+              this.load()
+            } else {
+              this.$message.error("保存失败")
+              this.dialogFormVisible = false
+              this.load()
+            }
+          })
+
     },
     handleSizeChange(pageSize) {
       console.log(pageSize)
